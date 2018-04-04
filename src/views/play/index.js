@@ -16,7 +16,6 @@ import {
   TouchableOpacity,
 } from 'react-native';
 import Video from 'react-native-video';
-Sound.setCategory('Playback');
 
 export default class App extends Component<{}> {
   constructor(props) {
@@ -37,36 +36,7 @@ export default class App extends Component<{}> {
 
   }
   play(url){
-    console.log(url);
-    var whoosh = new Sound(url,null, (error) => {
 
-
-
-
-      if (error) {
-        console.log('failed to load the sound', error);
-        return;
-      }
-      // loaded successfully
-      console.log('duration in seconds: ' + whoosh.getDuration() + 'number of channels: ' + whoosh.getNumberOfChannels());
-    });
-
-    // Play the sound with an onEnd callback
-    setTimeout(()=>{
-
-
-      whoosh.play((success) => {
-        if (success) {
-          console.log('successfully finished playing');
-        } else {
-          console.log('playback failed due to audio decoding errors');
-          // reset the player to its uninitialized state (android only)
-          // this is the only option to recover after an error occured and use the player again
-          whoosh.reset();
-        }
-      });
-
-    },2000);
 
 
   }
