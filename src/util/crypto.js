@@ -30,24 +30,19 @@ function createSecretKey(size) {
 }
 
 function aesEncrypt(text, secKey) {
-  const _text = text
-  let lv = new Buffer('0102030405060708', "binary")
-  let _secKey = new Buffer(secKey, "binary")
+  let _text = crypto.enc.Utf8.parse(text);
 
   //
-  lv = crypto.enc.Utf8.parse(lv);
-  _secKey = crypto.enc.Utf8.parse(_secKey);
-  let encrypted = crypto.AES.encrypt(_text,_secKey.toString(),{
-                iv : lv.toString(),
+  let lv = crypto.enc.Utf8.parse('0102030405060708');
+  let _secKey = crypto.enc.Utf8.parse(secKey);
+
+
+  let encrypted =crypto.AES.encrypt(_text,_secKey,{
+                iv : lv,
                 mode : crypto.mode.CBC
-            }).toString()+crypto.AES.encrypt(_text,_secKey.toString(),{
-                          iv : lv.toString(),
-                          mode : crypto.mode.CBC
-                      }).toString();
-  // const cipher = crypto.createCipheriv('AES-128-CBC', _secKey, lv)
-  // let encrypted = cipher.update(_text, 'utf8', 'base64')
-  // encrypted += cipher.final('base64')
-  return encrypted
+            });
+
+  return encrypted.toString();
 }
 
 function zfill(str, size) {

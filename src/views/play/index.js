@@ -15,7 +15,7 @@ import {
   View,
   TouchableOpacity,
 } from 'react-native';
-import Sound from 'react-native-sound';
+import Video from 'react-native-video';
 Sound.setCategory('Playback');
 
 export default class App extends Component<{}> {
@@ -23,18 +23,54 @@ export default class App extends Component<{}> {
       super(props);
       this.state = {
           show: false,
+          uri:"",
       };
+      this.player=null;
       console.log(this.state);
   }
   componentDidMount() {
-    this.listener=RCTDeviceEventEmitter.addListener("play",(id)=>{
+    this.listener=RCTDeviceEventEmitter.addListener("play",(data)=>{
 
-      this.play(id);
+      this.preplay(data.id);
 
     });
 
   }
-  async play(id){
+  play(url){
+    console.log(url);
+    var whoosh = new Sound(url,null, (error) => {
+
+
+
+
+      if (error) {
+        console.log('failed to load the sound', error);
+        return;
+      }
+      // loaded successfully
+      console.log('duration in seconds: ' + whoosh.getDuration() + 'number of channels: ' + whoosh.getNumberOfChannels());
+    });
+
+    // Play the sound with an onEnd callback
+    setTimeout(()=>{
+
+
+      whoosh.play((success) => {
+        if (success) {
+          console.log('successfully finished playing');
+        } else {
+          console.log('playback failed due to audio decoding errors');
+          // reset the player to its uninitialized state (android only)
+          // this is the only option to recover after an error occured and use the player again
+          whoosh.reset();
+        }
+      });
+
+    },2000);
+
+
+  }
+  async preplay(id){
 
 
       const cryptoreq = crypto({
@@ -66,9 +102,10 @@ export default class App extends Component<{}> {
 
                       })
           });
-          let data = await response.text();
+          let data = await response.json();
           console.log(data);
-
+          this.setState({uri:data.data[0].url.replace("http://", "https://")});
+          // this.play(data.data[0].url.replace("http://", "https://"));
       } catch (e) {
           console.error(e);
       }
@@ -88,6 +125,24 @@ export default class App extends Component<{}> {
           onPress={()=>{this.setState({show:!this.state.show})}}
             style={{width:'100%',height:200,display:this.state.show?'none':'flex'}}
           >
+            <Video source={this.state.uri?{uri: this.state.uri}:require('../../assets/default.mp3')}   // Can be a URL or a local file.
+       ref={(ref) => {
+         this.player = ref
+       }}
+       rate={1.0}                              // 0 is paused, 1 is normal.
+              volume={1.0}                            // 0 is muted, 1 is normal.
+              muted={false}                           // Mutes the audio entirely.
+              paused={false}                          // Pauses playback entirely.
+              resizeMode="cover"                      // Fill the whole screen at aspect ratio.*
+              repeat={true}                           // Repeat forever.
+              playInBackground={false}                // Audio continues to play when app entering background.
+              playWhenInactive={false}                // [iOS] Video continues to play when control or notification center are shown.
+              ignoreSilentSwitch={"ignore"}           // [iOS] ignore | obey - When 'ignore', audio will still play with the iOS hard silent switch set to silent. When 'obey', audio will toggle with the switch. When not specified, will inherit audio settings as usual.
+              progressUpdateInterval={250.0}          // [iOS] Interval to fire onProgress (default to ~250ms)
+
+              style={styles.backgroundVideo}
+
+     />
         </TouchableOpacity>
       </View>
     );
@@ -115,4 +170,11 @@ const styles = StyleSheet.create({
     color: '#333333',
     marginBottom: 5,
   },
+  backgroundVideo: {
+  position: 'absolute',
+  top: 0,
+  left: 0,
+  bottom: 0,
+  right: 0,
+},
 });

@@ -23,13 +23,7 @@ import album from './views/album';
 
 import Play from './views/play'
 
-import crypto from './util/crypto'
-const cryptoreq = crypto({
-  "ids": "[" + 528271287 + "]",
-  "br": 999000,
-  "csrf_token": ""
-});
-console.log(cryptoreq);
+
 import {
   Platform,
   StyleSheet,

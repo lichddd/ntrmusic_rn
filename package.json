@@ -4,7 +4,7 @@
   "private": true,
   "scripts": {
     "start": "node node_modules/react-native/local-cli/cli.js start",
-    "test": "jest"
+    "test": "node src/util/cryptp_test.js"
   },
   "dependencies": {
     "big-integer": "^1.6.26",
@@ -13,8 +13,8 @@
     "qs": "^6.5.1",
     "react": "16.2.0",
     "react-native": "0.52.0",
-    "react-native-sound": "^0.10.4",
     "react-native-vector-icons": "^4.5.0",
+    "react-native-video": "^2.0.0",
     "react-navigation": "^1.0.0-beta.27"
   },
   "devDependencies": {
