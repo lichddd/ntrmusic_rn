@@ -44,7 +44,7 @@ const instructions = Platform.select({
   animationEnabled: true,
   tabBarOptions: {
     showIcon:false,
-    // activeTintColor: '#e91e63',
+    activeTintColor: '#4fc08d',
     labelStyle: {
       fontSize: 24,
     },

@@ -65,14 +65,14 @@ export default class App extends Component < {} > {
               <View style={styles.info}>
                 <ImageBackground
                   style={styles.banner}
-                  source={{uri: (this.state.data.coverImgUrl && (this.state.data.coverImgUrl.replace("http://", "https://")) + `?param=150y150`)}}
+                  source={{uri: (this.state.data.coverImgUrl && ((this.state.data.coverImgUrl.replace("http://", "https://")) + `?param=150y150`))}}
 
                   defaultSource={require('../../assets/disk.png')}
                     >
                   <View style={{width:150,height:30,position:'absolute',top:150,overflow:'hidden'}}>
                   <Image
                     style={{width:150,height:150,position:'absolute',top:0,opacity:0.2,transform:[{rotateX: '180deg'},]}}
-                    source={{uri: (this.state.data.coverImgUrl && (this.state.data.coverImgUrl.replace("http://", "https://")) + `?param=150y150`)}}
+                    source={{uri: (this.state.data.coverImgUrl && ((this.state.data.coverImgUrl.replace("http://", "https://")) + `?param=150y150`))}}
                     defaultSource={require('../../assets/disk.png')}
                     >
 
@@ -97,8 +97,8 @@ export default class App extends Component < {} > {
                 </View>
 
                 {
-                    this.state.data.tracks && this.state.data.tracks.map((li) => {
-                        return <View style={styles.songs}  key={li.id+li.name}>
+                    this.state.data.tracks && this.state.data.tracks.map((li,i) => {
+                        return <View style={[styles.songs,i%2?{}:{backgroundColor:'#f4f4f4'}]}  key={li.id+li.name}>
                             <Text style={styles.songname} numberOfLines={1} onPress={() => {
                                     // this.props.navigation.navigate('song', {id: li.id})
                                     RCTDeviceEventEmitter.emit("play",li);
@@ -112,7 +112,7 @@ export default class App extends Component < {} > {
                                     return <View style={styles.artists} key={a.id+a.name} numberOfLines={1}>
 
                                         <Text style={styles.artistname} numberOfLines={1} onPress={() => {
-                                                this.props.navigation.navigate('song', {id: li.id})
+                                                this.props.navigation.navigate('artist', {id: a.id})
                                             }}>{a.name}</Text>
 
                                     </View>

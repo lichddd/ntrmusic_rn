@@ -83,7 +83,7 @@ export default class App extends Component < {} > {
                       <TouchableOpacity
                        onPress={() => {this.props.navigation.navigate('playlist', {id:li.id})}}>
                         <ImageBackground style={styles.banner} key={li.id} source={{
-                                uri: (li.picUrl + `?param=150y150`)
+                                uri: li.picUrl&&(li.picUrl + `?param=150y150`)
                             }}
                             >
                             <Text style={styles.count}>{('🎵'+Math.ceil(li.count/10000)+'万')}</Text>

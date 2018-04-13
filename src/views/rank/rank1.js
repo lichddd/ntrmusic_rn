@@ -12,8 +12,10 @@ import {
     View,
     ImageBackground,
     ScrollView,
-    TouchableHighlight
+    TouchableHighlight,
+    TouchableOpacity,
 } from 'react-native';
+import RCTDeviceEventEmitter from 'RCTDeviceEventEmitter';
 import config from '../../config';
 
 export default class App extends Component < {} > {
@@ -78,21 +80,23 @@ export default class App extends Component < {} > {
             {
                 this.state.list.map((li) => {
                     return <View key={li.id}>
+                        <TouchableOpacity  onPress={() => {this.props.navigation.navigate('playlist', {id:li.id})}}>
                         <ImageBackground style={styles.banner} key={li.code} source={{
                                 uri: (li.picUrl + `?param=375y150`)
                             }}>
                             <Text style={styles.time}>{(new Date(li.time)).Format('YYYY年MM月DD日更新')}</Text>
                         </ImageBackground>
+                        </TouchableOpacity>
                         {
                             li.list.map((t) => {
                                 return <View style={styles.songs} key={t.id} >
-                                    <Text style={styles.songname}  numberOfLines={1}  onPress={() => {this.props.navigation.navigate('song', {id:t.id})}}>{t.name}</Text>
+                                    <Text style={styles.songname}  numberOfLines={1}  onPress={() => {RCTDeviceEventEmitter.emit("play",t);}}>{t.name}</Text>
                                     {
                                       t.artists.map((a)=>{
 
                                         return <View style={styles.artists} key={a.id} numberOfLines={1} >
 
-                                                 <Text style={styles.artistname} numberOfLines={1} onPress={() => {this.props.navigation.navigate('song', {id:t.id})}}>{a.name}</Text>
+                                                 <Text style={styles.artistname} numberOfLines={1} onPress={() => {this.props.navigation.navigate('artist', {id:a.id})}}>{a.name}</Text>
 
 
 

@@ -8,7 +8,7 @@ import plugin from './plugin'
 import React, { Component } from 'react';
 import {  TabNavigator,StackNavigator,} from 'react-navigation';
 import Ionicons from 'react-native-vector-icons/Ionicons';
-
+import RCTDeviceEventEmitter from 'RCTDeviceEventEmitter';
 import allplaylist from './views/allplaylist';
 import rank from './views/rank';
 import search from './views/search';
@@ -33,20 +33,6 @@ import {
 
 
  const Tabs = TabNavigator({
-   home: {
-     screen: home,
-     navigationOptions: {
-       tabBarLabel: '首页',
-       tabBarIcon: ({ tintColor, focused }) => (
-         <Ionicons
-           name={focused ? 'ios-home' : 'ios-home-outline'}
-           size={26}
-           style={{ color: tintColor }}
-         />
-       ),
-     },
-
-   },
    rank: {
      screen: rank,
      navigationOptions: {
@@ -94,7 +80,7 @@ import {
   tabBarPosition: 'top',
   animationEnabled: true,
   tabBarOptions: {
-    // activeTintColor: '#e91e63',
+    activeTintColor: '#4fc08d',
     labelStyle: {
       fontSize: 16,
     },
@@ -115,6 +101,7 @@ const All = StackNavigator({
  );
 
 export default class App extends Component<{}> {
+
   render() {
     return (
       <View style={styles.container}>

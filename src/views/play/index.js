@@ -13,7 +13,10 @@ import {
   StyleSheet,
   Text,
   View,
+  Slider,
+  Image,
   TouchableOpacity,
+  ImageBackground,
 } from 'react-native';
 import Video from 'react-native-video';
 
@@ -23,14 +26,21 @@ export default class App extends Component<{}> {
       this.state = {
           show: false,
           uri:"",
+          play:false,
+          pic:"",
+          duration:0,
+          artists:[],
+          name:"",
+          currentPos:0,
       };
       this.player=null;
       console.log(this.state);
   }
+  sliderchange=false;
   componentDidMount() {
     this.listener=RCTDeviceEventEmitter.addListener("play",(data)=>{
-
-      this.preplay(data.id);
+                console.log(data);
+      this.preplay(data.id,data);
 
     });
 
@@ -40,7 +50,37 @@ export default class App extends Component<{}> {
 
 
   }
-  async preplay(id){
+  onVideoLoad(data){
+    try {
+      this.setState({ duration: data.duration });
+      console.log(data);
+    } catch (e) {
+
+    } finally {
+
+    }
+
+      }
+
+  onProgress(data)
+  {
+    let val = parseInt(data.currentTime)
+    try {
+      if (!this.sliderchange) {
+        this.setState({
+            currentPos: val,
+        })
+      }
+
+      console.log(val);
+    } catch (e) {
+
+    } finally {
+
+    }
+
+  }
+  async preplay(id,track){
 
 
       const cryptoreq = crypto({
@@ -74,7 +114,17 @@ export default class App extends Component<{}> {
           });
           let data = await response.json();
           console.log(data);
-          this.setState({uri:data.data[0].url.replace("http://", "https://")});
+          console.log(track);
+          this.setState({
+          uri:(data.data[0].url||'').replace("http://", "https://"),
+          pic:(track.al||track.album).picUrl.replace("http://", "https://"),
+          artists:(track.artists||track.ar),
+          name:track.name,
+          duration:0,
+          currentPos:0,
+          play:true,
+        });
+
           // this.play(data.data[0].url.replace("http://", "https://"));
       } catch (e) {
           console.error(e);
@@ -88,32 +138,77 @@ export default class App extends Component<{}> {
       <View style={styles.container}>
         <TouchableOpacity
         onPress={()=>{this.setState({show:!this.state.show})}}
-         style={{width:'100%',height:50,display:this.state.show?'flex':'none'}}
+         style={{width:'100%',height:this.state.show?100:50,display:'flex',}}
         >
+          <View style={{flexDirection: 'row',alignItems:'center',width:'100%',}}>
+          <ImageBackground
+            style={{width:50,height:50}}
+            source={{
+                  uri: this.state.pic&&(this.state.pic + `?param=150y150`)
+              }}
+            defaultSource={require('../../assets/disk.png')}
+              >
+          </ImageBackground>
+          <View style={{alignItems:'flex-start',justifyContent:'flex-start',flexGrow:1,}}>
+            <Text style={{textAlign:'left',fontSize:16,width:'100%'}}>{this.state.name}</Text>
+            <View style={{flexDirection: 'row',alignItems:'flex-start',width:'100%',}}>
+            {this.state.artists.map((a) => {
+                return <View style={styles.artists} key={a.id+a.name} numberOfLines={1}>
+
+                    <Text style={styles.artistname} numberOfLines={1} onPress={() => {
+                            this.props.navigation.navigate('song', {id: li.id})
+                        }}>{a.name}</Text>
+
+                </View>
+            })}
+            </View>
+          </View>
+          <Text style={{width:45}}>{(new Date(this.state.currentPos*1000)).Format('mm:ss')}{(new Date(this.state.duration*1000)).Format('mm:ss')}</Text>
+          <TouchableOpacity  onPress={()=>{this.state.uri?this.setState({play:!this.state.play}):'';}} style={{width:40,height:40,margin:5,backgroundColor:'#4fc08d',borderRadius:100,overflow:'hidden'}}>
+            <Image
+              style={{width:30,height:30,margin:5,display:this.state.play?'none':'flex',}}
+              source={require('../../assets/play.png')}
+              />
+            <Image
+              style={{width:25,height:25,margin:7.5,display:this.state.play?'flex':'none',}}
+              source={require('../../assets/pause.png')}
+              />
           </TouchableOpacity>
-          <TouchableOpacity
-          onPress={()=>{this.setState({show:!this.state.show})}}
-            style={{width:'100%',height:200,display:this.state.show?'none':'flex'}}
-          >
-            <Video source={this.state.uri?{uri: this.state.uri}:require('../../assets/default.mp3')}   // Can be a URL or a local file.
-       ref={(ref) => {
-         this.player = ref
-       }}
-       rate={1.0}                              // 0 is paused, 1 is normal.
-              volume={1.0}                            // 0 is muted, 1 is normal.
-              muted={false}                           // Mutes the audio entirely.
-              paused={false}                          // Pauses playback entirely.
-              resizeMode="cover"                      // Fill the whole screen at aspect ratio.*
-              repeat={true}                           // Repeat forever.
-              playInBackground={false}                // Audio continues to play when app entering background.
-              playWhenInactive={false}                // [iOS] Video continues to play when control or notification center are shown.
-              ignoreSilentSwitch={"ignore"}           // [iOS] ignore | obey - When 'ignore', audio will still play with the iOS hard silent switch set to silent. When 'obey', audio will toggle with the switch. When not specified, will inherit audio settings as usual.
-              progressUpdateInterval={250.0}          // [iOS] Interval to fire onProgress (default to ~250ms)
+          </View>
+          <View>
+          <Slider
+          style={{width:'100%'}}
+          value={this.state.currentPos}
+          minimumValue={0}
+          maximumValue={this.state.duration}
+          onValueChange={(value) => {this.sliderchange=true;}}
+          onSlidingComplete={(value) => {this.sliderchange=false;this.setState({currentPos: value});this.player.seek(value);}}/>
+          </View>
+          </TouchableOpacity>
 
-              style={styles.backgroundVideo}
+        <View>
+          <Video
+          style={{width:0,height:0}}
+          source={this.state.uri?{uri: this.state.uri}:require('../../assets/default.mp3')}   // Can be a URL or a local file.
+          ref={(ref) => {
+          this.player = ref
+          }}
+          rate={1.0}                              // 0 is paused, 1 is normal.
+            volume={1.0}                            // 0 is muted, 1 is normal.
+            muted={false}                           // Mutes the audio entirely.
+            paused={!this.state.play}                          // Pauses playback entirely.
+            resizeMode="cover"                      // Fill the whole screen at aspect ratio.*
+            repeat={true}                           // Repeat forever.
+            playInBackground={false}                // Audio continues to play when app entering background.
+            playWhenInactive={false}                // [iOS] Video continues to play when control or notification center are shown.
+            ignoreSilentSwitch={"ignore"}           // [iOS] ignore | obey - When 'ignore', audio will still play with the iOS hard silent switch set to silent. When 'obey', audio will toggle with the switch. When not specified, will inherit audio settings as usual.
+            progressUpdateInterval={250.0}          // [iOS] Interval to fire onProgress (default to ~250ms)
+            onProgress={(e)=>{this.onProgress(e)}}
+            onLoad={(e)=>{this.onVideoLoad(e)}}
+            style={styles.backgroundVideo}
 
-     />
-        </TouchableOpacity>
+          />
+        </View>
       </View>
     );
   }
@@ -124,7 +219,7 @@ const styles = StyleSheet.create({
     flex: 1,
     justifyContent: 'center',
     alignItems: 'center',
-    backgroundColor: '#666666',
+    backgroundColor: '#efefef',
 
     position:'absolute',
     bottom:0,
@@ -135,10 +230,15 @@ const styles = StyleSheet.create({
     textAlign: 'center',
     margin: 10,
   },
-  instructions: {
-    textAlign: 'center',
-    color: '#333333',
-    marginBottom: 5,
+  artists: {
+      flex:1,
+      flexWrap: 'nowrap',
+      flexDirection: 'row'
+  },
+
+  artistname: {
+      margin: 2,
+      fontSize: 11
   },
   backgroundVideo: {
   position: 'absolute',

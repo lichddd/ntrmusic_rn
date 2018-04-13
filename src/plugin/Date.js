@@ -7,5 +7,11 @@ Date.prototype.Format = function (formatStr) {
   str = str.replace(/M/g, month);
   str = str.replace(/dd|DD/, this.getDate() > 9 ? this.getDate().toString() : '0' + this.getDate());
   str = str.replace(/d|D/g, this.getDate());
+  var hour=this.getHours();
+  str = str.replace(/hh/, hour > 9 ? hour.toString() : '0' + hour);
+  var min = this.getMinutes();
+  str = str.replace(/mm/, min > 9 ? min.toString() : '0' + min);
+  var sec=this.getSeconds();
+  str = str.replace(/ss/, sec > 9 ? sec.toString() : '0' + sec);
   return str;
 }
