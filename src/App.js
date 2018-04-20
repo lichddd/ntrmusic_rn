@@ -12,7 +12,6 @@ import RCTDeviceEventEmitter from 'RCTDeviceEventEmitter';
 import allplaylist from './views/allplaylist';
 import rank from './views/rank';
 import search from './views/search';
-import home from './views/home';
 
 
 import song from './views/song';
